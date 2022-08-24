@@ -30,12 +30,12 @@ const getUsers = (req, res) => {
     };
 
     const postUser = (req, res) => {
-      const { id, firstname, lastname, email, city, language } = req.body;
+      const {  firstname, lastname, email, city, language } = req.body;
     
       database
         .query(
-          "INSERT INTO users(id, firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?, ?)",
-          [id,  firstname, lastname, email, city, language]
+          "INSERT INTO users(id, firstname, lastname, email, city, language) VALUES ( ?, ?, ?, ?, ?)",
+          [id, firstname, lastname, email, city, language]
         )
         .then(([result]) => {
           res.location(`/api/users/${result.insertId}`).sendStatus(201);
@@ -46,9 +46,30 @@ const getUsers = (req, res) => {
         });
     };
 
+    const updateUser = (req, res) => {
+      const id = parseInt(req.params.id);
+      const { firstname, lastname, email, city, language } = req.body;
+    
+      database
+        .query(
+          "update users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?  where id = ?",
+          [ firstname, lastname, email, city, language, id]
+        )
+        .then(([result]) => {
+          if (result.affectedRows === 0) {
+            res.status(404).send("Not Found");
+          } else {
+            res.sendStatus(204);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send("Error updating the user");
+        });
+    };
     module.exports = {
         getUsers,
         getUserById,
         postUser,
-
+        updateUser,
       };
