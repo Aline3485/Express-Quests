@@ -12,28 +12,23 @@ const welcome = (req, res) => {
 
 app.get("/", welcome);
 
+const { validateMovie } = require("./validators");
 const movieHandlers = require("./movieHandlers");
 
 app.get("/api/movies", movieHandlers.getMovies);
-app.post("/api/movies", movieHandlers.postMovie);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
-app.put("/api/movies/:id", movieHandlers.updateMovie);
-app.delete("/api/movies/:id", movieHandlers.deleteMovie);
-
-const { validateUser } = require("./validators.js");
-const userHandlers = require("./userHandlers");
-app.get("/api/users", userHandlers.getUsers);
-app.post("/api/users", validateUser, userHandlers.postUser);
-// app.post("/api/users", userHandlers.postUser);
-app.get("/api/users/:id", userHandlers.getUserById);
-// app.put("/api/users/:id", userHandlers.updateUser);
-app.put("/api/users/:id", validateUser, userHandlers.updateUser);
-app.delete("/api/users/:id", userHandlers.deleteUser);
-
-const { validateMovie } = require("./validators.js");
 app.post("/api/movies", validateMovie, movieHandlers.postMovie);
 app.put("/api/movies/:id", validateMovie, movieHandlers.updateMovie);
+app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 
+const { validateUser } = require("./validators");
+const userHandlers = require("./userHandlers");
+const { hashPassword } = require("./auth");
+app.get("/api/users", userHandlers.getUsers);
+app.get("/api/users/:id", userHandlers.getUserById);
+app.post("/api/users", validateUser, hashPassword, userHandlers.postUser);
+app.put("/api/users/:id", validateUser, userHandlers.updateUser);
+app.delete("/api/users/:id", userHandlers.deleteUser);
 
 app.listen(port, (err) => {
   if (err) {
@@ -42,12 +37,4 @@ app.listen(port, (err) => {
     console.log(`Server is listening on ${port}`);
   }
 });
-// {
-//   "id": 5,
-//    "firstname": "Jane",
-//   "lastname": "Doe",
-//   "email": "jane.doe@example.com",
-//   "city": "London",
-//   "language": "English"
 
-// }
